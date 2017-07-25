@@ -27,8 +27,8 @@
 #include "glaux.h"
 #include <math.h>
 
-static int slices = 16;
-static int stacks = 16;
+//static int slices = 16;
+//static int stacks = 16;
 static float angleRot = 0;
 static float xRot = 0.0f;
 static float yRot = 0.0f;
@@ -37,8 +37,8 @@ static float zRot = 0.0f;
 static float angleCamTeta = 0.0f;
 static float angleCamPhi = 0.0f;
 
-static float lxCam = 0.0f;
-static float lzCam = 1.0f;
+//static float lxCam = 0.0f;
+//static float lzCam = 1.0f;
 static float xCam = 0.0f;
 static float yCam = 0.0f;
 static float zCam = 5.0f;
@@ -51,22 +51,35 @@ static float xVec = 0.0f;
 static float yVec = 0.1f;
 static float zVec = 0.0f;
 
-static HDC hDC = NULL;
-static HGLRC hRC = NULL;
-static HWND hWnd = NULL;
-static HINSTANCE hInstance;
+static float xCenter = 0.0f;
+static float yCenter = 0.0f;
+static float zCenter = -30.0f;
 
-static GLuint base;
-static GLfloat cnt1;
-static GLfloat cnt2;
+static float fraction = 1.0f;
 
-static bool keys[256];
-static bool active = TRUE;
-static bool fullscreen = TRUE;
+static float posLegoX = 15.0f;
+static float posLegoY = 0.0f;
+static float posLegoZ = -50.0f;
+
+
+//static HDC hDC = NULL;
+//static HGLRC hRC = NULL;
+//static HWND hWnd = NULL;
+//static HINSTANCE hInstance;
+
+//static GLuint base;
+//static GLfloat cnt1;
+//static GLfloat cnt2;
+
+//static bool keys[256];
+//static bool active = TRUE;
+//static bool fullscreen = TRUE;
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static void camUp();
 float modulo(float x, float y);
+void upVector();
+void setLego(int zHeight);
 
 /* GLUT callback Handlers */
 
@@ -148,7 +161,7 @@ static void resize(int width, int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport(0, 0, width, height);
-    gluPerspective(90, ar, 1, 100);
+    gluPerspective(90, ar, 1, 10000);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -239,8 +252,94 @@ void setKapla(/*float pX, float pY, float pZ, float rX, float rY, float rZ*/) {
         glTranslatef(pX, pY, pZ);
         glRotatef(angleRot, rX, rY, rZ);
         glScalef(1.0f, 3.0f, 15.0f);
-        glutSolidCube(2);
+        glutSolidCube(2.0f);
     glPopMatrix();
+}
+
+/*void setLegoFull(float xHeight, float yHeight) {
+
+    GLUquadricObj* quadric = gluNewQuadric();
+
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+
+    glColor3f(1.0f, 0.0f, 0.0f);
+
+    glPushMatrix();
+        GLfloat matrix[16] = {
+        0, -1, 0, 0,
+        1, 0, 0, 0,
+        0, 0, 0, 0,
+        1, 1, 1, 1
+        };
+
+        glMultMatrixf(matrix);
+
+        glTranslatef(0.0f, 0.0f, -50.0f);
+        glRotatef(-90, 1, 0, 0);
+        gluCylinder(quadric, 2.4, 2.4, 1.7, 10, 10);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+        glTranslatef(0.0f, 0.0f, 1.7f);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+
+        glTranslatef(0.0f, -8.0f, -1.7f);
+        gluCylinder(quadric, 2.4, 2.4, 1.7, 10, 10);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+        glTranslatef(0.0f, 0.0f, 1.7f);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+
+        glTranslatef(0.0f, 4.0f, -3.6f);
+        glRotatef(90, 1, 0, 0);
+        glScalef(7.8f, 3.8f, 15.8f);
+        glutSolidCube(1.0f);
+
+    glPopMatrix();
+
+    gluDeleteQuadric(quadric);
+}*/
+
+void addLego(int depth, int height, int width) {
+
+    int i = 0;
+    int j = 0;
+
+    for(i=0 ; i<depth ; i++) {
+
+        posLegoX += 7.8f;
+        setLego(height);
+    }
+
+    for(j=0 ; j<width ; j++) {
+
+        posLegoZ -= 7.8;
+        setLego(height);
+    }
+}
+
+void setLego(int zHeight) {
+
+
+    GLUquadricObj* quadric = gluNewQuadric();
+
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+
+    glColor3f(0.72f, 0.72f, 0.05f);
+
+    glPushMatrix();
+
+        glTranslatef(posLegoX, posLegoY, posLegoZ);
+        glRotatef(-90, 1, 0, 0);
+        gluCylinder(quadric, 2.4, 2.4, 1.7, 10, 10);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+        glTranslatef(0.0f, 0.0f, 1.7f);
+        gluDisk(quadric, 0.0, 2.4, 10, 10);
+
+        glTranslatef(0.0f, 0.0f, ((-3.2f * zHeight) / 2.0f) - 1.7f);
+        glScalef(7.8f, 7.8f, 3.2f * zHeight);
+        glutSolidCube(1.0f);
+
+    glPopMatrix();
+
+    gluDeleteQuadric(quadric);
 }
 
 void renderScene(void) {
@@ -251,16 +350,18 @@ void renderScene(void) {
 
     glPushMatrix();
         gluLookAt(xCam, yCam, zCam,
-                  0.0f, 0.0f, -30.0f,
+                  xCenter, yCenter, zCenter,
                   xVec, yVec, zVec);
 
-        xPos = -10.0f;
+        /*xPos = -10.0f;
         yPos = -10.0f;
         setKapla();
 
         xPos = 10.0f;
         yPos = 10.0f;
-        setKapla();
+        setKapla();*/
+
+        addLego(2, 3, 2);
 
     glPopMatrix();
 
@@ -290,16 +391,15 @@ static void key(unsigned char key, int x, int y)
             break;
 
         case '+':
-            slices++;
-            stacks++;
+
+            zCam -= fraction;
+            zCenter -= fraction;
             break;
 
         case '-':
-            if (slices>3 && stacks>3)
-            {
-                slices--;
-                stacks--;
-            }
+
+            zCam += fraction;
+            zCenter += fraction;
             break;
 
         case 'x':
@@ -341,32 +441,42 @@ static void key(unsigned char key, int x, int y)
 
 static void specialKey(int key, int xx, int yy) {
 
-    float fraction = 0.1f;
-
     switch (key) {
 
 		case GLUT_KEY_LEFT :
 
             angleCamTeta -= fraction;
-			xCam = ((zCam - zPos) * (sin(angleCamTeta)));
+            xCam -= fraction;
+            xCenter -= fraction;
+			//xCam = ((zCam - zPos) * (sin(angleCamTeta)));
+			//upVector();
 			break;
 
 		case GLUT_KEY_RIGHT :
 
             angleCamTeta += fraction;
-			xCam = ((zCam - zPos) * (sin(angleCamTeta)));
+            xCam += fraction;
+            xCenter += fraction;
+			//xCam = ((zCam - zPos) * (sin(angleCamTeta)));
+			//upVector();
 			break;
 
 		case GLUT_KEY_UP :
 
             angleCamPhi += fraction;
-            camUp();
+            yCam += fraction;
+            yCenter += fraction;
+            //camUp();
+            //upVector();
 			break;
 
 		case GLUT_KEY_DOWN :
 
             angleCamPhi -= fraction;
-			yCam = ((zCam - zPos) * (sin(angleCamPhi)));
+            yCam -= fraction;
+            yCenter -= fraction;
+			//yCam = ((zCam - zPos) * (sin(angleCamPhi)));
+			//upVector();
 			break;
 	}
 
@@ -377,27 +487,26 @@ static void camUp() {
 
     if((modulo(angleCamPhi, (2*M_PI))) >= 0 && (modulo(angleCamPhi, (2*M_PI))) < (M_PI / 2)) {
 
-        yCam = ((zCam - zPos) * (sin(angleCamPhi)));
+        yCam = ((zCam - zCenter) * (sin(angleCamPhi)));
     }
 
     else if((modulo(angleCamPhi, (2*M_PI))) >= (M_PI / 2) && (modulo(angleCamPhi, (2*M_PI))) < M_PI) {
 
-        yCam = ((zCam - zPos) * (sin(angleCamPhi)));
+        yCam = ((zCam - zCenter) * (sin(angleCamPhi)));
         zCam = zPos - zCam;
     }
 
     else if((modulo(angleCamPhi, (2*M_PI))) >= M_PI && (modulo(angleCamPhi, (2*M_PI))) < ((3 * M_PI) / 2)) {
 
-        yCam = -((zCam - zPos) * (sin(angleCamPhi)));
+        yCam = -((zCam - zCenter) * (sin(angleCamPhi)));
         zCam = zPos - zCam;
     }
 
     else if((modulo(angleCamPhi, (2*M_PI))) >= ((3 * M_PI) / 2)) {
 
-        yCam = -((zCam - zPos) * (sin(angleCamPhi)));
+        yCam = -((zCam - zCenter) * (sin(angleCamPhi)));
     }
 }
-
 
 float modulo(float x, float y)
 {
@@ -406,24 +515,37 @@ float modulo(float x, float y)
     else return (x+y);
 }
 
-float
+void upVector() {
+
+    xVec = yCam - yCenter;
+    yVec = xCenter - xCam;
+
+    printf("   xVec : %f  yVec : %f", xVec, yVec);
+}
 
 static void idle(void)
 {
     glutPostRedisplay();
 }
 
-const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-//const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-//const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-//const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+const GLfloat light_ambient[]  = { 1.0f, 4.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLint light_position[] = { 20, 20, 20, 1 };
 
-//const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-//const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-//const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-//const GLfloat high_shininess[] = { 100.0f };
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
 
-/* Program entry point */
+GLuint lego;
+
+/*GLubyte texture[16] = {
+                        0, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF,
+                        0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0
+                        };
+
+Program entry point */
 
 int main(int argc, char **argv) {
 
@@ -435,6 +557,13 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Lighthouse3D- GLUT Tutorial");
 
     glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
+
+    glEnable(GL_TEXTURE_2D);
+    glShadeModel(GL_SMOOTH);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(resize);
 
@@ -443,10 +572,12 @@ int main(int argc, char **argv) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_LIGHT0);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    glLightiv(GL_LIGHT0, GL_POSITION, light_position);
 
 	glutMainLoop();
 

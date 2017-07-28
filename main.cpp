@@ -43,9 +43,9 @@ static float xCam = 0.0f;
 static float yCam = 0.0f;
 static float zCam = 5.0f;
 
-static float xPos = 0.0f;
+static float xPos = 15.0f;
 static float yPos = 0.0f;
-static float zPos = -30.0f;
+static float zPos = -50.0f;
 
 static float xVec = 0.0f;
 static float yVec = 0.1f;
@@ -60,6 +60,8 @@ static float fraction = 1.0f;
 static float posLegoX = 15.0f;
 static float posLegoY = 0.0f;
 static float posLegoZ = -50.0f;
+
+static float legoColor[3] = {0.79f, 0.79f, 0.5f};
 
 
 //static HDC hDC = NULL;
@@ -248,6 +250,8 @@ void setKapla(/*float pX, float pY, float pZ, float rX, float rY, float rZ*/) {
     float pY = yPos;
     float pZ = zPos;
 
+    printf("KAPLA : %f, %f, %f\n", pX, pY, pZ);
+
     glPushMatrix();
         glTranslatef(pX, pY, pZ);
         glRotatef(angleRot, rX, rY, rZ);
@@ -302,21 +306,37 @@ void addLego(int depth, int height, int width) {
     int i = 0;
     int j = 0;
 
+    for(i=1 ; i<=width ; i++) {
 
-    posLegoX = 15.0f;
-    posLegoY = 0.0f;
-    posLegoZ = -50.0f;
+        if((width % 2) == 0)
+            posLegoX = 15.0f - (7.8f / 2.0f);
 
-    for(i=0 ; i<width ; i++) {
+        else if((width % 2) != 0)
+            posLegoX = 15.0f;
 
-        posLegoX += 7.8f;
-        setLego(height);
+        if((i % 2) == 0)
+            posLegoX += 7.8f * (i / 2);
 
-        posLegoZ = -50.0f;
+        else if((i % 2) != 0)
+            posLegoX -= 7.8f * (((i + 1) / 2) - 1);
 
-        for(j=0 ; j<depth ; j++) {
 
-            posLegoZ -= 7.8;
+        for(j=1 ; j<=depth ; j++) {
+
+            if((depth % 2) == 0)
+                posLegoZ = -50.0f  - (7.8f / 2.0f);
+
+            else if((depth % 2) != 0)
+                posLegoZ = -50.0f;
+
+            if((j % 2) == 0)
+                posLegoZ += 7.8f * (j / 2);
+
+            else if((j % 2) != 0)
+                posLegoZ -= 7.8f * (((j + 1) / 2) - 1);
+
+            printf("i : %d | j : %d\n", i%2, j%2);
+
             setLego(height);
         }
     }
@@ -324,13 +344,11 @@ void addLego(int depth, int height, int width) {
 
 void setLego(int zHeight) {
 
-
-
     GLUquadricObj* quadric = gluNewQuadric();
 
     gluQuadricDrawStyle(quadric, GLU_FILL);
 
-    glColor3f(0.72f, 0.72f, 0.05f);
+    glColor3f(legoColor[0], legoColor[1], legoColor[2]);
 
     glPushMatrix();
 
@@ -361,15 +379,9 @@ void renderScene(void) {
                   xCenter, yCenter, zCenter,
                   xVec, yVec, zVec);
 
-        xPos = -10.0f;
-        yPos = -10.0f;
         setKapla();
 
-        xPos = 10.0f;
-        yPos = 10.0f;
-        setKapla();
-
-        addLego(7, 3, 4);
+        addLego(7, 5, 4);
 
     glPopMatrix();
 

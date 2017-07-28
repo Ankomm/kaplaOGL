@@ -75,7 +75,7 @@ static float posLegoZ = -50.0f;
 //static bool active = TRUE;
 //static bool fullscreen = TRUE;
 
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+//LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static void camUp();
 float modulo(float x, float y);
 void upVector();
@@ -217,9 +217,9 @@ static void resize(int width, int height)
     glPopMatrix();
 
     glutSwapBuffers();
-}*/
+}
 
-/*void setTriangle(void) {
+void setTriangle(void) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -302,20 +302,28 @@ void addLego(int depth, int height, int width) {
     int i = 0;
     int j = 0;
 
-    for(i=0 ; i<depth ; i++) {
+
+    posLegoX = 15.0f;
+    posLegoY = 0.0f;
+    posLegoZ = -50.0f;
+
+    for(i=0 ; i<width ; i++) {
 
         posLegoX += 7.8f;
         setLego(height);
-    }
 
-    for(j=0 ; j<width ; j++) {
+        posLegoZ = -50.0f;
 
-        posLegoZ -= 7.8;
-        setLego(height);
+        for(j=0 ; j<depth ; j++) {
+
+            posLegoZ -= 7.8;
+            setLego(height);
+        }
     }
 }
 
 void setLego(int zHeight) {
+
 
 
     GLUquadricObj* quadric = gluNewQuadric();
@@ -353,15 +361,15 @@ void renderScene(void) {
                   xCenter, yCenter, zCenter,
                   xVec, yVec, zVec);
 
-        /*xPos = -10.0f;
+        xPos = -10.0f;
         yPos = -10.0f;
         setKapla();
 
         xPos = 10.0f;
         yPos = 10.0f;
-        setKapla();*/
+        setKapla();
 
-        addLego(2, 3, 2);
+        addLego(7, 3, 4);
 
     glPopMatrix();
 
@@ -558,11 +566,11 @@ int main(int argc, char **argv) {
 
     glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
-    glEnable(GL_TEXTURE_2D);
+    /*glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);*/
 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(resize);
